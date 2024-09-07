@@ -1,0 +1,64 @@
+name: "DockerHub Push Action"
+description: "Build and push Docker image to DockerHub"
+inputs:
+  repo:
+    description: "Docker image name"
+    required: true
+  branch:
+    description: "Branch name will be prefixed to image name as branch_repo_name:commit_hash"
+    required: false
+  commit-hash:
+    description: "Commit hash"
+    required: false
+    default: "latest"
+  docker-username:
+    description: "Docker Hub username"
+    required: true
+  docker-password:
+    description: "Docker Hub password"
+    required: true
+  env-file:
+    description: ".env file contents"
+    required: false
+  push:
+    description: "Should it push image to docker"
+    required: false
+    default: true
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Parse Docker Image Name
+      shell: bash
+      id: image_name
+      run: |
+        # Get the branch name from the input or fallback to current branch
+        BRANCH=${{ inputs.branch || github.ref_name }}
+        # Ensure branch name does not contain any slashes or invalid Docker characters
+        BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_\-]/_/g')
+
+        # Get commit hash from input or default to "latest"
+        COMMIT_HASH=${{ inputs.commit-hash || 'latest' }}
+
+        # Combine branch, repo, and commit hash to form the image name
+        IMAGE_NAME="${BRANCH}_${{ inputs.repo }}:${COMMIT_HASH}"
+
+        echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ inputs.docker-username }}
+        password: ${{ inputs.docker-password }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: ${{ inputs.push }}
+        tags: ${{ env.IMAGE_NAME }}
+        file: Dockerfile # Specify the Dockerfile path if it's not the default
+        cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+        cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
