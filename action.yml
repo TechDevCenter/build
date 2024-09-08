@@ -48,6 +48,8 @@ runs:
 
         echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
+        echo "Docker Image Name: $IMAGE_NAME"
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
