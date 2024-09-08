@@ -15,7 +15,7 @@ inputs:
     description: "Docker Hub username"
     required: true
   docker-password:
-    description: "Docker Hub password"
+    description: "Docker Hub password or PAT"
     required: true
   env-file:
     description: ".env file contents"
