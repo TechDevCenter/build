@@ -60,5 +60,3 @@ runs:
         push: ${{ inputs.push }}
         tags: ${{ env.IMAGE_NAME }}
         file: Dockerfile # Specify the Dockerfile path if it's not the default
-        cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
-        cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
