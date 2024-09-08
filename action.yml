@@ -43,7 +43,7 @@ runs:
         COMMIT_HASH=${{ inputs.commit-hash || 'latest' }}
 
         # Combine branch, repo, and commit hash to form the image name
-        IMAGE_NAME="${BRANCH}_${{ inputs.repo }}:${COMMIT_HASH}"
+        IMAGE_NAME="techdevcenter/${BRANCH}_${{ inputs.repo }}:${COMMIT_HASH}"
 
         echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
 
