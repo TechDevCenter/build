@@ -34,20 +34,16 @@ runs:
       shell: bash
       id: image_name
       run: |
-        # Get the branch name from the input or fallback to current branch
-        BRANCH=${{ inputs.branch || github.ref_name }}
-        # Ensure branch name does not contain any slashes or invalid Docker characters
-        BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_\-]/_/g')
         # Docker username
-        USERNAME=${{ inputs.docker-username  }}
+        USERNAME=${{ inputs.docker-username }}
         # Get commit hash from input or default to "latest"
         COMMIT_HASH=${{ inputs.commit-hash || 'latest' }}
 
-        # Combine branch, repo, and commit hash to form the image name
-        IMAGE_NAME="${USERNAME}/${BRANCH}_${{ inputs.repo }}:${COMMIT_HASH}"
+        # Construct the image name in the correct format
+        IMAGE_NAME="${USERNAME}/${{ inputs.repo }}:${COMMIT_HASH}"
 
+        # Output the image name for visibility
         echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
-
         echo "Docker Image Name: $IMAGE_NAME"
 
     - name: Log in to Docker Hub
