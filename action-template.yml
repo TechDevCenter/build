@@ -40,6 +40,9 @@ inputs:
     description: 'Path to the build context'
     required: false
     default: '.'
+  dockerfile:
+    description: 'Will overwrite the file input to Docker build, {context}/Dockerfile will be used if not provided'
+    required: false
   target:
     description: 'Build target'
     required: false
@@ -85,7 +88,7 @@ runs:
       env:
         DOCKER_BUILDKIT: 1
       with:
-        file: ${{ inputs.context }}/Dockerfile
+        file: ${{ inputs.dockerfile || format('{0}/Dockerfile', inputs.context) }}
         context: ${{ inputs.context }}
         target: ${{ inputs.target }}
         push: ${{ inputs.push }}
