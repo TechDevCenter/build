@@ -40,6 +40,9 @@ inputs:
     description: 'Path to the build context'
     required: false
     default: '.'
+  dockerfile:
+    description: 'Will overwrite the file input to Docker build, {context}/Dockerfile will be used if not provided'
+    required: false
   target:
     description: 'Build target'
     required: false
@@ -57,7 +60,7 @@ runs:
         GITHUB_BRANCH: '${{ inputs.branch }}'
         GITHUB_REPO: '${{ inputs.repo }}'
         GITHUB_SHA: '${{ inputs.commit-hash }}'
-      run: curl -o- https://raw.githubusercontent.com/techdevcenter/build/5529b708dd910b13c2152da9959082e695cf4a02/parse_image_name.sh | bash
+      run: curl -o- https://raw.githubusercontent.com/techdevcenter/build/e8427a9d2145fe02695152c581f9647ece3e0497/parse_image_name.sh | bash
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
@@ -78,14 +81,14 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GITHUB_USERNAME: ${{ inputs.github-username }}
         NPMRC: ${{ inputs.npmrc }}
-      run: curl -o- https://raw.githubusercontent.com/techdevcenter/build/5529b708dd910b13c2152da9959082e695cf4a02/parse_secrets.sh | bash
+      run: curl -o- https://raw.githubusercontent.com/techdevcenter/build/e8427a9d2145fe02695152c581f9647ece3e0497/parse_secrets.sh | bash
 
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v5
       env:
         DOCKER_BUILDKIT: 1
       with:
-        file: ${{ inputs.context }}/Dockerfile
+        file: ${{ inputs.dockerfile || format('{0}/Dockerfile', inputs.context) }}
         context: ${{ inputs.context }}
         target: ${{ inputs.target }}
         push: ${{ inputs.push }}
